@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-brand-red: #F13738;
+  --color-brand-red-vivid: #F33638;
+  --color-brand-black: #000000;
+  --color-brand-white: #FFFFFF;
+  --color-brand-yellow: #FEE600;
+  --font-sans: var(--font-poppins);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #000000;
+  color: #FFFFFF;
+  font-family: var(--font-poppins), Poppins, sans-serif;
+}
+
+/* Event card hover animation */
+.event-card {
+  transition: transform 0.3s ease;
+}
+
+/* Image wrapper – soft blur edges via mask instead of overflow-hidden */
+.event-image-wrap {
+  mask-image:
+    linear-gradient(to right,  transparent 0%, black 1%, black 99%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 1%, black 99%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.event-card.overlay-visible {
+  transform: translateY(-16px);
+  filter: drop-shadow(0px 8px 16px rgba(255, 255, 255, 0.2));
+}
+
+/* Title bar fades out on hover */
+.event-card .event-title-bar {
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+.event-card.overlay-visible .event-title-bar {
+  opacity: 0;
+}
+
+/* Overlay with description slides up over the image */
+.event-card .event-overlay {
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.event-card.overlay-visible .event-overlay {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Expanding bottom section with button */
+.event-expand-section {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  display: grid;
+  grid-template-rows: 0fr;
+  z-index: 30;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.event-expand-section > .event-expand-inner {
+  overflow: hidden;
+}
+
+.event-card.overlay-visible .event-expand-section {
+  grid-template-rows: 1fr;
+}
+
+/* Partner card hover */
+.partner-card {
+  background: #111111;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.5rem;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.partner-card:hover {
+  background: #1a1a1a;
+  border-color: rgb(254 230 0 / 0.4);
+}
+
+.partner-card .partner-logo {
+  border: 1px solid rgb(255 255 255 / 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.partner-card:hover .partner-logo {
+  border-color: rgb(254 230 0 / 0.3);
+}
+
+.partner-card .partner-initial {
+  color: rgb(255 255 255 / 0.4);
+  transition: color 0.3s ease;
+}
+
+.partner-card:hover .partner-initial {
+  color: rgb(254 230 0 / 0.6);
+}
+
+/* Social card hover */
+.social-card {
+  background: #070601;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.25);
+  transition: box-shadow 0.3s ease;
+}
+
+.social-card:hover {
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);
+}
+
+/* About section expand */
+.about-expand {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+
+.about-expand.open {
+  max-height: 600px;
+}
