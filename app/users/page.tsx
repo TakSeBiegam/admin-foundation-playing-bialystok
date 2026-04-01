@@ -64,11 +64,13 @@ function UserModal({
   user,
   onSave,
   onClose,
+  currentRole,
 }: {
   open: boolean;
   user?: AdminUser | null;
   onSave: (data: UserFormValues | EditFormValues) => void;
   onClose: () => void;
+  currentRole?: Role | undefined;
 }) {
   const {
     register,
@@ -130,7 +132,7 @@ function UserModal({
                       type="radio"
                       value={m}
                       {...register("createMode")}
-                      className="accent-[#FEE600]"
+                      className="accent-brand-yellow"
                     />
                     <span className="text-white/70 text-sm flex items-center gap-1">
                       {m === "email" ? (
@@ -171,7 +173,7 @@ function UserModal({
                 aria-invalid={!!errors.email}
               />
               {errors.email && (
-                <p className="text-[#F13738] text-xs">{errors.email.message}</p>
+                <p className="text-brand-red text-xs">{errors.email.message}</p>
               )}
             </div>
           )}
@@ -198,7 +200,7 @@ function UserModal({
                 aria-invalid={!!errors.username}
               />
               {errors.username && (
-                <p className="text-[#F13738] text-xs">
+                <p className="text-brand-red text-xs">
                   {errors.username.message}
                 </p>
               )}
@@ -210,11 +212,14 @@ function UserModal({
             <select
               id="u-role"
               {...register("role", { required: true })}
-              className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#FEE600]/60 transition-colors"
+              className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-yellow/60 transition-colors"
             >
               <option value="EDITOR">Redaktor</option>
               <option value="MODERATOR">Moderator</option>
               <option value="ADMIN">Administrator</option>
+              <option value="OWNER" disabled={currentRole !== "OWNER"}>
+                Właściciel
+              </option>
             </select>
           </div>
 
@@ -223,8 +228,8 @@ function UserModal({
               <Label htmlFor="u-password">
                 Hasło{" "}
                 {!user && createMode === "username"
-                  ? "(opcjonalne – jeśli puste, wylosuje się)"
-                  : "(opcjonalne – zmień tylko jeśli chcesz)"}
+                  ? "(opcjonalne - jeśli puste, wylosuje się)"
+                  : "(opcjonalne - zmień tylko jeśli chcesz)"}
               </Label>
               <Input
                 id="u-password"
@@ -278,7 +283,7 @@ function GeneratedPasswordModal({
           wyświetlone.
         </p>
         <div className="flex items-center gap-2 mt-2">
-          <code className="flex-1 bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-[#FEE600] text-sm font-mono tracking-wider">
+          <code className="flex-1 bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-brand-yellow text-sm font-mono tracking-wider">
             {password}
           </code>
           <button
@@ -304,9 +309,10 @@ function GeneratedPasswordModal({
 
 // ─── Page ─────────────────────────────────────────────────────────
 export default function UsersPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const currentRole = session?.user?.role as Role | undefined;
+  if (status === "loading") return null;
   const currentId = session?.user?.id;
 
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -318,14 +324,37 @@ export default function UsersPage() {
   const [pwModalOpen, setPwModalOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
+  // Owner confirmation flow
+  const [ownerConfirmOpen, setOwnerConfirmOpen] = useState(false);
+  const [pendingOwnerData, setPendingOwnerData] = useState<
+    UserFormValues | EditFormValues | null
+  >(null);
+  const [ownerCountdown, setOwnerCountdown] = useState(10);
+
   const addToast = (message: string, type: ToastData["type"] = "success") =>
     setToasts((prev) => [...prev, { id: Date.now(), message, type }]);
   const removeToast = (id: number) =>
     setToasts((prev) => prev.filter((t) => t.id !== id));
 
+  useEffect(() => {
+    if (!ownerConfirmOpen) return;
+    setOwnerCountdown(10);
+    const t = setInterval(() => {
+      setOwnerCountdown((c) => {
+        if (c <= 1) {
+          clearInterval(t);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [ownerConfirmOpen]);
+
   // Redirect non-admins
   useEffect(() => {
-    if (session && currentRole !== "ADMIN") router.replace("/dashboard");
+    if (session && currentRole !== "ADMIN" && currentRole !== "OWNER")
+      router.replace("/dashboard");
   }, [session, currentRole, router]);
 
   const loadUsers = useCallback(async () => {
@@ -356,12 +385,14 @@ export default function UsersPage() {
     setEditTarget(null);
   };
 
-  const handleSave = async (data: UserFormValues | EditFormValues) => {
-    const d = data as UserFormValues & EditFormValues;
+  const performSave = async (
+    d: UserFormValues | EditFormValues,
+    target: AdminUser | null,
+  ) => {
     try {
-      if (editTarget) {
+      if (target) {
         await gql(UPDATE_USER, {
-          id: editTarget.id,
+          id: target.id,
           input: {
             email: d.email || undefined,
             username: d.username || undefined,
@@ -371,15 +402,20 @@ export default function UsersPage() {
         });
         addToast(`Zaktualizowano użytkownika`);
       } else {
+        const createData = d as UserFormValues;
+
         const res = await gql<{ createUser: AdminUser }>(CREATE_USER, {
           input: {
             email:
-              (d.createMode === "email" ? d.email : undefined) || undefined,
+              (createData.createMode === "email"
+                ? createData.email
+                : undefined) || undefined,
             username:
-              (d.createMode === "username" ? d.username : undefined) ||
-              undefined,
-            role: d.role,
-            password: d.password || undefined,
+              (createData.createMode === "username"
+                ? createData.username
+                : undefined) || undefined,
+            role: createData.role,
+            password: createData.password || undefined,
           },
         });
         addToast(
@@ -387,10 +423,7 @@ export default function UsersPage() {
         );
 
         // If no password set (email mode or username with no password), show generated
-        if (!d.password) {
-          // We ask backend for the generated password via resetUserPassword just created
-          // Actually - the createUser mutation generates a password internally.
-          // We need to surface it. Let's auto-reset after create to get it.
+        if (!createData.password) {
           const pw = await gql<{ resetUserPassword: string }>(RESET_PASSWORD, {
             id: res.createUser.id,
           });
@@ -402,6 +435,31 @@ export default function UsersPage() {
     } catch (e) {
       addToast((e as Error).message || "Błąd zapisu", "error");
     }
+  };
+
+  const handleSave = async (data: UserFormValues | EditFormValues) => {
+    const d = data as UserFormValues & EditFormValues;
+
+    // If assigning OWNER to someone else, show confirmation with delay
+    const assigningOwnerToOther =
+      d.role === "OWNER" && (!editTarget || editTarget.id !== currentId);
+
+    if (assigningOwnerToOther) {
+      setPendingOwnerData(d);
+      setOwnerCountdown(10);
+      setOwnerConfirmOpen(true);
+      return;
+    }
+
+    await performSave(d, editTarget);
+    closeModal();
+  };
+
+  const confirmOwnerAssignment = async () => {
+    if (!pendingOwnerData) return;
+    await performSave(pendingOwnerData, editTarget);
+    setOwnerConfirmOpen(false);
+    setPendingOwnerData(null);
     closeModal();
   };
 
@@ -429,7 +487,8 @@ export default function UsersPage() {
     }
   };
 
-  if (currentRole && currentRole !== "ADMIN") return null;
+  if (currentRole && currentRole !== "ADMIN" && currentRole !== "OWNER")
+    return null;
 
   return (
     <div className="flex min-h-screen">
@@ -484,12 +543,12 @@ export default function UsersPage() {
                   return (
                     <tr
                       key={u.id}
-                      className={`border-b border-white/5 hover:bg-white/[0.02] transition-colors ${i % 2 === 0 ? "" : "bg-white/[0.01]"}`}
+                      className={`border-b border-white/5 hover:bg-white/2 transition-colors ${i % 2 === 0 ? "" : "bg-white/1"}`}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div
-                            className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm"
+                            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-bold text-sm"
                             style={{
                               backgroundColor: `${color}20`,
                               border: `1px solid ${color}30`,
@@ -538,14 +597,14 @@ export default function UsersPage() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleResetPassword(u)}
-                            className="p-1.5 text-white/40 hover:text-[#FEE600] hover:bg-[#FEE600]/10 rounded-md transition-colors"
+                            className="p-1.5 text-white/40 hover:text-brand-yellow hover:bg-brand-yellow/10 rounded-md transition-colors"
                             title="Resetuj hasło"
                           >
                             <RefreshCw className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => openEdit(u)}
-                            className="p-1.5 text-white/40 hover:text-[#FEE600] hover:bg-[#FEE600]/10 rounded-md transition-colors"
+                            className="p-1.5 text-white/40 hover:text-brand-yellow hover:bg-brand-yellow/10 rounded-md transition-colors"
                             title="Edytuj"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -553,7 +612,7 @@ export default function UsersPage() {
                           {!isCurrentUser && (
                             <button
                               onClick={() => setDeleteTarget(u)}
-                              className="p-1.5 text-white/40 hover:text-[#F13738] hover:bg-[#F13738]/10 rounded-md transition-colors"
+                              className="p-1.5 text-white/40 hover:text-brand-red hover:bg-brand-red/10 rounded-md transition-colors"
                               title="Usuń"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -575,12 +634,51 @@ export default function UsersPage() {
         user={editTarget}
         onSave={handleSave}
         onClose={closeModal}
+        currentRole={currentRole}
       />
       <GeneratedPasswordModal
         open={pwModalOpen}
         password={generatedPassword}
         onClose={() => setPwModalOpen(false)}
       />
+      <Dialog
+        open={ownerConfirmOpen}
+        onOpenChange={(v) => !v && setOwnerConfirmOpen(false)}
+      >
+        <DialogContent className="max-w-md bg-[#111111] border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white">
+              Nadajesz rolę Właściciela
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-white/60 text-sm">
+            Nadajesz użytkownikowi rolę Właściciela — osoba otrzyma takie same
+            prawa jak Ty, dostęp do wszystkich elementów strony oraz możliwość
+            pozbawienia Cię uprawnień. Ta operacja może całkowicie zmienić
+            dostęp do konta.
+          </p>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setOwnerConfirmOpen(false);
+                setPendingOwnerData(null);
+              }}
+            >
+              Anuluj
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmOwnerAssignment}
+              disabled={ownerCountdown > 0}
+            >
+              {ownerCountdown > 0
+                ? `Akceptuj (${ownerCountdown}s)`
+                : "Akceptuj"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       <ConfirmDialog
         open={!!deleteTarget}
         title="Usuń użytkownika"

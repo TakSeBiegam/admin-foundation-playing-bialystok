@@ -32,7 +32,7 @@ body {
   transition: transform 0.3s ease;
 }
 
-/* Image wrapper – soft blur edges via mask instead of overflow-hidden */
+/* Image wrapper - soft blur edges via mask instead of overflow-hidden */
 .event-image-wrap {
   mask-image:
     linear-gradient(to right,  transparent 0%, black 1%, black 99%, transparent 100%),

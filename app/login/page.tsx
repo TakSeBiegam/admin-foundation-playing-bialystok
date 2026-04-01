@@ -38,7 +38,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-14 h-14 rounded-xl bg-[#F13738] flex items-center justify-center mb-4 shadow-lg shadow-red-900/40">
+          <div className="w-14 h-14 rounded-xl bg-brand-red flex items-center justify-center mb-4 shadow-lg shadow-red-900/40">
             <span className="text-white font-black text-2xl">GB</span>
           </div>
           <h1 className="text-2xl font-black text-white tracking-tight">
@@ -54,16 +54,16 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-white/60 text-xs font-medium uppercase tracking-wide">
-                Email
+                Email lub nazwa użytkownika
               </label>
               <input
-                type="email"
-                autoComplete="email"
+                type="text"
+                autoComplete="username"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-[#FEE600]/60 focus:ring-1 focus:ring-[#FEE600]/20 transition-colors"
-                placeholder="admin@example.com"
+                placeholder="admin@example.com lub nazwa_użytkownika"
               />
             </div>
 
@@ -97,7 +97,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-[#F13738] text-sm bg-[#F13738]/10 border border-[#F13738]/20 rounded-lg px-4 py-2.5">
+              <p className="text-brand-red text-sm bg-brand-red/10 border border-[#F13738]/20 rounded-lg px-4 py-2.5">
                 {error}
               </p>
             )}
@@ -105,7 +105,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-[#FEE600] hover:bg-[#FEE600]/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold py-3 rounded-lg text-sm transition-colors mt-2"
+              className="w-full flex items-center justify-center gap-2 bg-brand-yellow hover:bg-brand-yellow/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-bold py-3 rounded-lg text-sm transition-colors mt-2"
             >
               {loading ? (
                 <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />

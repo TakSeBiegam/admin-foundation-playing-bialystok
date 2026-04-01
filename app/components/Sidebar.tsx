@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   CalendarDays,
   Handshake,
+  MessageSquareText,
   Users,
   LogOut,
 } from "lucide-react";
@@ -24,7 +25,13 @@ const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Wydarzenia", href: "/events", icon: CalendarDays },
   { label: "Partnerzy", href: "/partners", icon: Handshake },
-  { label: "Użytkownicy", href: "/users", icon: Users, roles: ["ADMIN"] },
+  { label: "Formularze", href: "/messages", icon: MessageSquareText },
+  {
+    label: "Użytkownicy",
+    href: "/users",
+    icon: Users,
+    roles: ["ADMIN", "OWNER"],
+  },
 ];
 
 export default function Sidebar() {
@@ -42,12 +49,12 @@ export default function Sidebar() {
       {/* Brand header */}
       <div className="px-6 py-5 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-sm bg-[#F13738] flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-sm bg-brand-red flex items-center justify-center shrink-0">
             <span className="text-white font-black text-sm">GB</span>
           </div>
           <div className="leading-tight">
             <p className="text-white font-bold text-sm">Grający</p>
-            <p className="text-white/60 text-xs">Białystok – Admin</p>
+            <p className="text-white/60 text-xs">Białystok - Admin</p>
           </div>
         </div>
       </div>
@@ -64,7 +71,7 @@ export default function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
                     active
-                      ? "bg-[#FEE600]/10 text-[#FEE600] border border-[#FEE600]/20"
+                      ? "bg-brand-yellow/10 text-brand-yellow border border-brand-yellow/20"
                       : "text-white/70 hover:text-white hover:bg-white/5",
                   )}
                 >
@@ -80,7 +87,7 @@ export default function Sidebar() {
       {/* User info + logout */}
       <div className="px-4 py-4 border-t border-white/10 space-y-3">
         <div className="flex items-center gap-3 px-1">
-          <div className="w-8 h-8 rounded-full bg-[#2a2a2a] border border-white/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#2a2a2a] border border-white/10 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-bold">
               {displayName.charAt(0).toUpperCase()}
             </span>

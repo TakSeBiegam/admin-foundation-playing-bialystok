@@ -76,12 +76,15 @@ function CalendarView({
   const totalCells = Math.ceil((startOffset + lastDay.getDate()) / 7) * 7;
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-  const eventsByDate = events.reduce<Record<string, Event[]>>((accumulator, event) => {
-    const key = event.date.slice(0, 10);
-    accumulator[key] ??= [];
-    accumulator[key].push(event);
-    return accumulator;
-  }, {});
+  const eventsByDate = events.reduce<Record<string, Event[]>>(
+    (accumulator, event) => {
+      const key = event.date.slice(0, 10);
+      accumulator[key] ??= [];
+      accumulator[key].push(event);
+      return accumulator;
+    },
+    {},
+  );
 
   const goToPreviousMonth = () => {
     if (month === 0) {
@@ -142,7 +145,8 @@ function CalendarView({
         <div className="grid grid-cols-7">
           {Array.from({ length: totalCells }).map((_, index) => {
             const dayNumber = index - startOffset + 1;
-            const isCurrentMonth = dayNumber >= 1 && dayNumber <= lastDay.getDate();
+            const isCurrentMonth =
+              dayNumber >= 1 && dayNumber <= lastDay.getDate();
             const dateKey = isCurrentMonth
               ? `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`
               : "";
@@ -158,7 +162,7 @@ function CalendarView({
                   <>
                     <span
                       className={`mb-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium ${
-                        isToday ? "bg-[#FEE600] text-black" : "text-white/40"
+                        isToday ? "bg-brand-yellow text-black" : "text-white/40"
                       }`}
                     >
                       {dayNumber}
@@ -167,7 +171,7 @@ function CalendarView({
                       {dayEvents.map((event) => (
                         <div
                           key={event.id}
-                          className="group relative truncate rounded border border-[#F13738]/30 bg-[#F13738]/20 px-1 py-0.5 text-[10px] text-[#F13738] transition-colors hover:bg-[#F13738]/30"
+                          className="group relative truncate rounded border border-[#F13738]/30 bg-brand-red/20 px-1 py-0.5 text-[10px] text-brand-red transition-colors hover:bg-brand-red/30"
                           title={event.title}
                         >
                           <span>{event.title}</span>
@@ -175,14 +179,14 @@ function CalendarView({
                             <button
                               type="button"
                               onClick={() => onEdit(event)}
-                              className="p-0.5 text-white/60 hover:text-[#FEE600]"
+                              className="p-0.5 text-white/60 hover:text-brand-yellow"
                             >
                               <Pencil className="h-3 w-3" />
                             </button>
                             <button
                               type="button"
                               onClick={() => onDelete(event)}
-                              className="p-0.5 text-white/60 hover:text-[#F13738]"
+                              className="p-0.5 text-white/60 hover:text-brand-red"
                             >
                               <Trash2 className="h-3 w-3" />
                             </button>
@@ -210,9 +214,12 @@ export default function EventsPage() {
   const [deleteTarget, setDeleteTarget] = useState<Event | null>(null);
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const addToast = useCallback((message: string, type: ToastData["type"] = "success") => {
-    setToasts((previous) => [...previous, { id: Date.now(), message, type }]);
-  }, []);
+  const addToast = useCallback(
+    (message: string, type: ToastData["type"] = "success") => {
+      setToasts((previous) => [...previous, { id: Date.now(), message, type }]);
+    },
+    [],
+  );
 
   const removeToast = (id: number) => {
     setToasts((previous) => previous.filter((toast) => toast.id !== id));
@@ -357,7 +364,9 @@ export default function EventsPage() {
           <div className="py-20 text-center text-white/40">
             <CalendarDays className="mx-auto mb-4 h-12 w-12 opacity-30" />
             <p className="text-lg">Brak wydarzeń</p>
-            <p className="mt-1 text-sm">Kliknij "Dodaj wydarzenie", aby zacząć.</p>
+            <p className="mt-1 text-sm">
+              Kliknij przycisk Dodaj wydarzenie, aby zacząć.
+            </p>
           </div>
         ) : (
           <div className="overflow-hidden rounded-lg border border-white/10">
@@ -365,9 +374,15 @@ export default function EventsPage() {
               <thead>
                 <tr className="border-b border-white/10 bg-[#1a1a1a] text-xs uppercase tracking-wide text-white/50">
                   <th className="px-4 py-3 text-left font-medium">Tytuł</th>
-                  <th className="hidden px-4 py-3 text-left font-medium md:table-cell">Data</th>
-                  <th className="hidden px-4 py-3 text-left font-medium lg:table-cell">Lokalizacja</th>
-                  <th className="hidden px-4 py-3 text-left font-medium lg:table-cell">Godzina</th>
+                  <th className="hidden px-4 py-3 text-left font-medium md:table-cell">
+                    Data
+                  </th>
+                  <th className="hidden px-4 py-3 text-left font-medium lg:table-cell">
+                    Lokalizacja
+                  </th>
+                  <th className="hidden px-4 py-3 text-left font-medium lg:table-cell">
+                    Godzina
+                  </th>
                   <th className="px-4 py-3 text-right font-medium">Akcje</th>
                 </tr>
               </thead>
@@ -379,17 +394,19 @@ export default function EventsPage() {
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-[#F13738]/20 bg-[#F13738]/10">
-                          <CalendarDays className="h-3.5 w-3.5 text-[#F13738]" />
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[#F13738]/20 bg-brand-red/10">
+                          <CalendarDays className="h-3.5 w-3.5 text-brand-red" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium leading-tight text-white">{event.title}</p>
+                          <p className="text-sm font-medium leading-tight text-white">
+                            {event.title}
+                          </p>
                           {event.facebookUrl ? (
                             <a
                               href={event.facebookUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="mt-0.5 flex items-center gap-1 text-xs text-white/30 hover:text-[#FEE600]"
+                              className="mt-0.5 flex items-center gap-1 text-xs text-white/30 hover:text-brand-yellow"
                             >
                               <ExternalLink className="h-3 w-3" />
                               Facebook
@@ -407,8 +424,10 @@ export default function EventsPage() {
                     <td className="hidden px-4 py-3 text-white/60 lg:table-cell">
                       {event.location ? (
                         <div className="flex items-center gap-1.5">
-                          <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-white/30" />
-                          <span className="max-w-[180px] truncate">{event.location}</span>
+                          <MapPin className="h-3.5 w-3.5 shrink-0 text-white/30" />
+                          <span className="max-w-[180px] truncate">
+                            {event.location}
+                          </span>
                         </div>
                       ) : (
                         "-"
@@ -425,11 +444,11 @@ export default function EventsPage() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex flex-row items-center justify-end gap-x-4">
                         <button
                           type="button"
                           onClick={() => openEdit(event)}
-                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-[#FEE600]/10 hover:text-[#FEE600]"
+                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-brand-yellow/10 hover:text-brand-yellow"
                           title="Edytuj"
                         >
                           <Pencil className="h-3.5 w-3.5" />
@@ -437,7 +456,7 @@ export default function EventsPage() {
                         <button
                           type="button"
                           onClick={() => setDeleteTarget(event)}
-                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-[#F13738]/10 hover:text-[#F13738]"
+                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-brand-red/10 hover:text-brand-red"
                           title="Usuń"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -452,7 +471,12 @@ export default function EventsPage() {
         )}
       </main>
 
-      <EventModal open={modalOpen} event={editTarget} onSave={handleSave} onClose={closeModal} />
+      <EventModal
+        open={modalOpen}
+        event={editTarget}
+        onSave={handleSave}
+        onClose={closeModal}
+      />
       <ConfirmDialog
         open={!!deleteTarget}
         title="Usuń wydarzenie"

@@ -10,7 +10,9 @@ import {
   Trash2,
 } from "lucide-react";
 import Sidebar from "@/app/components/Sidebar";
-import PartnerModal, { type PartnerFormValues } from "@/app/components/PartnerModal";
+import PartnerModal, {
+  type PartnerFormValues,
+} from "@/app/components/PartnerModal";
 import ConfirmDialog from "@/app/components/ConfirmDialog";
 import ToastContainer, { type ToastData } from "@/app/components/Toast";
 import { Button } from "@/app/components/ui/button";
@@ -43,9 +45,12 @@ export default function PartnersPage() {
   const [deleteTarget, setDeleteTarget] = useState<Partner | null>(null);
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const addToast = useCallback((message: string, type: ToastData["type"] = "success") => {
-    setToasts((previous) => [...previous, { id: Date.now(), message, type }]);
-  }, []);
+  const addToast = useCallback(
+    (message: string, type: ToastData["type"] = "success") => {
+      setToasts((previous) => [...previous, { id: Date.now(), message, type }]);
+    },
+    [],
+  );
 
   const removeToast = (id: number) => {
     setToasts((previous) => previous.filter((toast) => toast.id !== id));
@@ -157,7 +162,9 @@ export default function PartnersPage() {
           <div className="py-20 text-center text-white/40">
             <Handshake className="mx-auto mb-4 h-12 w-12 opacity-30" />
             <p className="text-lg">Brak partnerów</p>
-            <p className="mt-1 text-sm">Kliknij "Dodaj partnera", aby zacząć.</p>
+            <p className="mt-1 text-sm">
+              Kliknij przycisk Dodaj partnera, aby zacząć.
+            </p>
           </div>
         ) : (
           <div className="overflow-hidden rounded-lg border border-white/10">
@@ -165,8 +172,12 @@ export default function PartnersPage() {
               <thead>
                 <tr className="border-b border-white/10 bg-[#1a1a1a] text-xs uppercase tracking-wide text-white/50">
                   <th className="px-4 py-3 text-left font-medium">Partner</th>
-                  <th className="hidden px-4 py-3 text-left font-medium md:table-cell">Opis</th>
-                  <th className="hidden px-4 py-3 text-left font-medium lg:table-cell">Strona</th>
+                  <th className="hidden px-4 py-3 text-left font-medium md:table-cell">
+                    Opis
+                  </th>
+                  <th className="hidden px-4 py-3 text-left font-medium lg:table-cell">
+                    Strona
+                  </th>
                   <th className="px-4 py-3 text-right font-medium">Akcje</th>
                 </tr>
               </thead>
@@ -178,7 +189,7 @@ export default function PartnersPage() {
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-[#1a1a1a]">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-[#1a1a1a]">
                           {partner.logoUrl ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -187,14 +198,18 @@ export default function PartnersPage() {
                               className="h-full w-full object-contain p-1"
                             />
                           ) : (
-                            <span className="text-xs font-bold text-white/40">{initials(partner.name)}</span>
+                            <span className="text-xs font-bold text-white/40">
+                              {initials(partner.name)}
+                            </span>
                           )}
                         </div>
                         <p className="font-medium text-white">{partner.name}</p>
                       </div>
                     </td>
                     <td className="hidden px-4 py-3 text-white/50 md:table-cell">
-                      <p className="max-w-[220px] truncate">{partner.description ?? "-"}</p>
+                      <p className="max-w-[220px] truncate">
+                        {partner.description ?? "-"}
+                      </p>
                     </td>
                     <td className="hidden px-4 py-3 lg:table-cell">
                       {partner.websiteUrl ? (
@@ -202,13 +217,13 @@ export default function PartnersPage() {
                           href={partner.websiteUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-sm text-[#FEE600]/70 transition-colors hover:text-[#FEE600]"
+                          className="flex items-center gap-1.5 text-sm text-brand-yellow/70 transition-colors hover:text-brand-yellow"
                         >
                           <Globe className="h-3.5 w-3.5" />
                           <span className="max-w-[180px] truncate">
                             {partner.websiteUrl.replace(/^https?:\/\//, "")}
                           </span>
-                          <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                          <ExternalLink className="h-3 w-3 shrink-0" />
                         </a>
                       ) : (
                         <span className="text-white/20">-</span>
@@ -219,7 +234,7 @@ export default function PartnersPage() {
                         <button
                           type="button"
                           onClick={() => openEdit(partner)}
-                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-[#FEE600]/10 hover:text-[#FEE600]"
+                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-brand-yellow/10 hover:text-brand-yellow"
                           title="Edytuj"
                         >
                           <Pencil className="h-3.5 w-3.5" />
@@ -227,7 +242,7 @@ export default function PartnersPage() {
                         <button
                           type="button"
                           onClick={() => setDeleteTarget(partner)}
-                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-[#F13738]/10 hover:text-[#F13738]"
+                          className="rounded-md p-1.5 text-white/40 transition-colors hover:bg-brand-red/10 hover:text-brand-red"
                           title="Usuń"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -242,7 +257,12 @@ export default function PartnersPage() {
         )}
       </main>
 
-      <PartnerModal open={modalOpen} partner={editTarget} onSave={handleSave} onClose={closeModal} />
+      <PartnerModal
+        open={modalOpen}
+        partner={editTarget}
+        onSave={handleSave}
+        onClose={closeModal}
+      />
       <ConfirmDialog
         open={!!deleteTarget}
         title="Usuń partnera"

@@ -100,7 +100,7 @@ export default function EventModal({
               aria-invalid={!!errors.title}
             />
             {errors.title && (
-              <p className="text-[#F13738] text-xs">{errors.title.message}</p>
+              <p className="text-brand-red text-xs">{errors.title.message}</p>
             )}
           </div>
 
@@ -114,7 +114,7 @@ export default function EventModal({
                 aria-invalid={!!errors.date}
               />
               {errors.date && (
-                <p className="text-[#F13738] text-xs">{errors.date.message}</p>
+                <p className="text-brand-red text-xs">{errors.date.message}</p>
               )}
             </div>
             <div className="space-y-1.5">
@@ -160,7 +160,7 @@ export default function EventModal({
               })}
             />
             {errors.facebookUrl && (
-              <p className="text-[#F13738] text-xs">
+              <p className="text-brand-red text-xs">
                 {errors.facebookUrl.message}
               </p>
             )}
@@ -180,7 +180,7 @@ export default function EventModal({
               })}
             />
             {errors.imageUrl && (
-              <p className="text-[#F13738] text-xs">
+              <p className="text-brand-red text-xs">
                 {errors.imageUrl.message}
               </p>
             )}

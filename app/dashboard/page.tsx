@@ -92,7 +92,7 @@ export default function DashboardPage() {
               className="group flex items-center gap-5 bg-[#111111] border border-white/10 rounded-lg p-6 hover:border-white/20 transition-all duration-200"
             >
               <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
                 style={{
                   backgroundColor: `${stat.accent}15`,
                   border: `1px solid ${stat.accent}30`,
@@ -119,7 +119,7 @@ export default function DashboardPage() {
             <h2 className="text-white font-semibold">Nadchodzące wydarzenia</h2>
             <Link
               href="/events"
-              className="text-[#FEE600] text-sm hover:underline flex items-center gap-1"
+              className="text-brand-yellow text-sm hover:underline flex items-center gap-1"
             >
               Wszystkie <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -142,8 +142,8 @@ export default function DashboardPage() {
                   className={`flex items-center gap-4 px-5 py-4 bg-[#111111] hover:bg-[#1a1a1a] transition-colors
                                         ${i < upcomingEvents.length - 1 ? "border-b border-white/5" : ""}`}
                 >
-                  <div className="flex-shrink-0 w-10 h-10 bg-[#FEE600]/10 border border-[#FEE600]/20 rounded flex items-center justify-center">
-                    <CalendarDays className="w-4 h-4 text-[#FEE600]" />
+                  <div className="shrink-0 w-10 h-10 bg-brand-yellow/10 border border-[#FEE600]/20 rounded flex items-center justify-center">
+                    <CalendarDays className="w-4 h-4 text-brand-yellow" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-white font-medium text-sm truncate">
@@ -153,7 +153,7 @@ export default function DashboardPage() {
                       {event.location}
                     </p>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className="text-white/60 text-xs">
                       {new Date(event.date).toLocaleDateString("pl-PL", {
                         day: "2-digit",

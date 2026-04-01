@@ -10,7 +10,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Admin – Grający Białystok",
+  title: "Admin - Grający Białystok",
   description: "Panel administracyjny fundacji Grający Białystok Johnny'ego",
 };
 

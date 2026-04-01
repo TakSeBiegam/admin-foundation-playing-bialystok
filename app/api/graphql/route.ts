@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 function normalizeBackendUrl(rawUrl: string) {
   return rawUrl.endsWith("/query")
@@ -14,11 +16,17 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
+    // Attach server-side session user info to backend request headers
+    const session: any = await getServerSession(authOptions as any);
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (session?.user?.id) headers["X-User-Id"] = session.user.id as string;
+    if (session?.user?.role) headers["X-User-Role"] = session.user.role as string;
+
     const response = await fetch(BACKEND_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(body),
       cache: "no-store",
     });

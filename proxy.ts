@@ -9,6 +9,7 @@ export const config = {
     "/dashboard/:path*",
     "/events/:path*",
     "/partners/:path*",
+    "/messages/:path*",
     "/users/:path*",
   ],
 };

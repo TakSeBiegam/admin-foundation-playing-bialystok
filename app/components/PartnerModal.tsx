@@ -74,7 +74,7 @@ export default function PartnerModal({
               aria-invalid={!!errors.name}
             />
             {errors.name && (
-              <p className="text-[#F13738] text-xs">{errors.name.message}</p>
+              <p className="text-brand-red text-xs">{errors.name.message}</p>
             )}
           </div>
 
@@ -92,7 +92,7 @@ export default function PartnerModal({
               })}
             />
             {errors.websiteUrl && (
-              <p className="text-[#F13738] text-xs">
+              <p className="text-brand-red text-xs">
                 {errors.websiteUrl.message}
               </p>
             )}
@@ -112,7 +112,7 @@ export default function PartnerModal({
               })}
             />
             {errors.logoUrl && (
-              <p className="text-[#F13738] text-xs">{errors.logoUrl.message}</p>
+              <p className="text-brand-red text-xs">{errors.logoUrl.message}</p>
             )}
           </div>
 
