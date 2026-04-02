@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   CalendarDays,
   Handshake,
+  BriefcaseBusiness,
   MessageSquareText,
   Users,
   LogOut,
@@ -25,6 +26,7 @@ const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Wydarzenia", href: "/events", icon: CalendarDays },
   { label: "Partnerzy", href: "/partners", icon: Handshake },
+  { label: "Oferta", href: "/offer", icon: BriefcaseBusiness },
   { label: "Formularze", href: "/messages", icon: MessageSquareText },
   {
     label: "Użytkownicy",

@@ -28,6 +28,26 @@ export interface Partner {
   description?: string | null;
 }
 
+export interface OfferBlock {
+  id: string;
+  section: string;
+  blockType: string;
+  badge?: string | null;
+  title?: string | null;
+  subtitle?: string | null;
+  content?: string | null;
+  items: string[];
+  highlight?: string | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  ctaLabel?: string | null;
+  ctaHref?: string | null;
+  isFeatured: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ContactSubmissionNote {
   id: string;
   submissionId: string;

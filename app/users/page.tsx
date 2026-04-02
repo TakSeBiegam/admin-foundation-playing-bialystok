@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -87,9 +87,11 @@ function UserModal({
       role: "EDITOR",
     },
   });
-
   const createMode = watch("createMode");
-
+  const normalizedCurrentRole = (currentRole ?? "").toString().toUpperCase();
+  const canChangeRole =
+    normalizedCurrentRole === "OWNER" || normalizedCurrentRole === "ADMIN";
+  const canAssignOwner = normalizedCurrentRole === "OWNER";
   useEffect(() => {
     if (user) {
       reset({
@@ -212,12 +214,13 @@ function UserModal({
             <select
               id="u-role"
               {...register("role", { required: true })}
+              disabled={!canChangeRole}
               className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-brand-yellow/60 transition-colors"
             >
               <option value="EDITOR">Redaktor</option>
               <option value="MODERATOR">Moderator</option>
               <option value="ADMIN">Administrator</option>
-              <option value="OWNER" disabled={currentRole !== "OWNER"}>
+              <option value="OWNER" disabled={!canAssignOwner}>
                 Właściciel
               </option>
             </select>
@@ -309,11 +312,11 @@ function GeneratedPasswordModal({
 
 // ─── Page ─────────────────────────────────────────────────────────
 export default function UsersPage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
   const currentRole = session?.user?.role as Role | undefined;
-  if (status === "loading") return null;
   const currentId = session?.user?.id;
+  const lastRoleSyncAttemptRef = useRef<Role | null>(null);
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -324,7 +327,9 @@ export default function UsersPage() {
   const [pwModalOpen, setPwModalOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  // Owner confirmation flow
+  // Prefer authoritative role from backend users list when available
+  const effectiveRole: Role | undefined =
+    users.find((u) => u.id === currentId)?.role ?? currentRole;
   const [ownerConfirmOpen, setOwnerConfirmOpen] = useState(false);
   const [pendingOwnerData, setPendingOwnerData] = useState<
     UserFormValues | EditFormValues | null
@@ -351,11 +356,30 @@ export default function UsersPage() {
     return () => clearInterval(t);
   }, [ownerConfirmOpen]);
 
-  // Redirect non-admins
   useEffect(() => {
-    if (session && currentRole !== "ADMIN" && currentRole !== "OWNER")
+    if (status === "loading" || loading) return;
+    if (
+      session &&
+      effectiveRole &&
+      effectiveRole !== "ADMIN" &&
+      effectiveRole !== "OWNER"
+    )
       router.replace("/dashboard");
-  }, [session, currentRole, router]);
+  }, [session, effectiveRole, loading, router, status]);
+
+  useEffect(() => {
+    if (status === "loading" || loading || !session || !effectiveRole) return;
+
+    if (effectiveRole === currentRole) {
+      lastRoleSyncAttemptRef.current = null;
+      return;
+    }
+
+    if (lastRoleSyncAttemptRef.current === effectiveRole) return;
+
+    lastRoleSyncAttemptRef.current = effectiveRole;
+    void updateSession();
+  }, [session, status, loading, effectiveRole, currentRole, updateSession]);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -432,6 +456,10 @@ export default function UsersPage() {
         }
       }
       await loadUsers();
+
+      if (target?.id === currentId) {
+        await updateSession();
+      }
     } catch (e) {
       addToast((e as Error).message || "Błąd zapisu", "error");
     }
@@ -487,7 +515,13 @@ export default function UsersPage() {
     }
   };
 
-  if (currentRole && currentRole !== "ADMIN" && currentRole !== "OWNER")
+  if (
+    status !== "loading" &&
+    !loading &&
+    effectiveRole &&
+    effectiveRole !== "ADMIN" &&
+    effectiveRole !== "OWNER"
+  )
     return null;
 
   return (
@@ -634,7 +668,7 @@ export default function UsersPage() {
         user={editTarget}
         onSave={handleSave}
         onClose={closeModal}
-        currentRole={currentRole}
+        currentRole={effectiveRole}
       />
       <GeneratedPasswordModal
         open={pwModalOpen}

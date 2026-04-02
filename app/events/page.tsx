@@ -327,7 +327,7 @@ export default function EventsPage() {
               <button
                 type="button"
                 onClick={() => setViewMode("list")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === "list" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === "list" ? "bg-white/10 text-white" : "text-white hover:text-white/70"}`}
               >
                 <LayoutList className="h-4 w-4" />
                 Lista
@@ -335,7 +335,7 @@ export default function EventsPage() {
               <button
                 type="button"
                 onClick={() => setViewMode("calendar")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === "calendar" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${viewMode === "calendar" ? "bg-white/10 text-white" : "text-white hover:text-white/70"}`}
               >
                 <CalendarRange className="h-4 w-4" />
                 Kalendarz
@@ -350,7 +350,7 @@ export default function EventsPage() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-white/30">
+          <div className="flex items-center justify-center py-20 text-white">
             <span className="mr-3 h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
             Ładowanie...
           </div>
@@ -361,7 +361,7 @@ export default function EventsPage() {
             onDelete={(event) => setDeleteTarget(event)}
           />
         ) : events.length === 0 ? (
-          <div className="py-20 text-center text-white/40">
+          <div className="py-20 text-center text-white">
             <CalendarDays className="mx-auto mb-4 h-12 w-12 opacity-30" />
             <p className="text-lg">Brak wydarzeń</p>
             <p className="mt-1 text-sm">

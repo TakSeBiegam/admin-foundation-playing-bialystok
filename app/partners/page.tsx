@@ -159,7 +159,7 @@ export default function PartnersPage() {
             Ładowanie...
           </div>
         ) : partners.length === 0 ? (
-          <div className="py-20 text-center text-white/40">
+          <div className="py-20 text-center text-white">
             <Handshake className="mx-auto mb-4 h-12 w-12 opacity-30" />
             <p className="text-lg">Brak partnerów</p>
             <p className="mt-1 text-sm">

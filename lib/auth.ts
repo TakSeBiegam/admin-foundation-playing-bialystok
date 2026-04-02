@@ -24,6 +24,21 @@ const SIGN_IN_MUTATION = `
   }
 `;
 
+async function fetchLatestUserRole(userId: string) {
+  const res = await fetch(BACKEND_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-User-Id": userId,
+    },
+    body: JSON.stringify({ query: `query { me { id role } }` }),
+    cache: "no-store",
+  });
+
+  const json = await res.json();
+  return json.errors || !json.data?.me?.role ? null : json.data.me.role;
+}
+
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
@@ -72,6 +87,18 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role ?? "EDITOR";
       }
+
+      if (token.id) {
+        try {
+          const latestRole = await fetchLatestUserRole(String(token.id));
+          if (latestRole) {
+            token.role = latestRole;
+          }
+        } catch {
+          // ignore - keep existing token role
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {

@@ -461,7 +461,7 @@ export default function MessagesPage() {
                 Ładowanie...
               </div>
             ) : submissions.length === 0 ? (
-              <div className="py-14 text-center text-white/40">
+              <div className="py-14 text-center text-white">
                 <MailWarning className="mx-auto mb-3 h-10 w-10 opacity-40" />
                 Brak formularzy kontaktowych
               </div>
