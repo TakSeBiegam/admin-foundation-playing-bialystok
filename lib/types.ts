@@ -10,6 +10,7 @@ export type AdminResource =
   | "MESSAGES"
   | "USERS"
   | "STATUTE"
+  | "PRIVACY_POLICY"
   | "ROLE_PERMISSIONS"
   | "AUDIT_LOGS"
   | "ADVANCED_ANALYTICS";
@@ -40,7 +41,7 @@ export interface Event {
   id: string;
   title: string;
   description?: string | null;
-  date: string;       // YYYY-MM-DD
+  date: string; // YYYY-MM-DD
   location?: string | null;
   time?: string | null;
   facebookUrl?: string | null;
@@ -181,4 +182,3 @@ export const ROLE_COLORS: Record<Role, string> = {
   EDITOR: "#4ade80",
   OWNER: "#9b59b6",
 };
-
