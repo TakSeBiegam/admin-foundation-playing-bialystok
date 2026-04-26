@@ -7,7 +7,7 @@ import { Eye, EyeOff, LogIn } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -19,7 +19,7 @@ export default function LoginPage() {
     setLoading(true);
 
     const res = await signIn("credentials", {
-      email,
+      identifier,
       password,
       redirect: false,
     });
@@ -27,7 +27,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (res?.error) {
-      setError("Nieprawidłowy email lub hasło.");
+      setError("Nieprawidłowy login, email lub hasło.");
     } else {
       router.replace("/dashboard");
     }
@@ -60,9 +60,9 @@ export default function LoginPage() {
                 type="text"
                 autoComplete="username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-[#FEE600]/60 focus:ring-1 focus:ring-[#FEE600]/20 transition-colors"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-brand-yellow/60 focus:ring-1 focus:ring-brand-yellow/20 transition-colors"
                 placeholder="admin@example.com lub nazwa_użytkownika"
               />
             </div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 pr-11 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-[#FEE600]/60 focus:ring-1 focus:ring-[#FEE600]/20 transition-colors"
+                  className="w-full bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 pr-11 text-white text-sm placeholder:text-white/25 focus:outline-none focus:border-brand-yellow/60 focus:ring-1 focus:ring-brand-yellow/20 transition-colors"
                   placeholder="••••••••"
                 />
                 <button
@@ -97,7 +97,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-brand-red text-sm bg-brand-red/10 border border-[#F13738]/20 rounded-lg px-4 py-2.5">
+              <p className="text-brand-red text-sm bg-brand-red/10 border border-brand-red/20 rounded-lg px-4 py-2.5">
                 {error}
               </p>
             )}

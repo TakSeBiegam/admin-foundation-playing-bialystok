@@ -1,5 +1,35 @@
 export type Role = "ADMIN" | "MODERATOR" | "EDITOR" | "OWNER";
 
+export type AdminResource =
+  | "AUTH"
+  | "DASHBOARD"
+  | "OFFER_PAGE"
+  | "ABOUT_US_PAGE"
+  | "EVENTS"
+  | "PARTNERS"
+  | "CATALOG"
+  | "GALLERY"
+  | "MESSAGES"
+  | "USERS"
+  | "STATUTE"
+  | "ROLE_PERMISSIONS"
+  | "AUDIT_LOGS"
+  | "ADVANCED_ANALYTICS";
+
+export type AuditAction =
+  | "LOGIN"
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "RESET_PASSWORD"
+  | "ARCHIVE"
+  | "UNARCHIVE"
+  | "MARK_READ"
+  | "MARK_UNREAD"
+  | "ADD_NOTE"
+  | "ROLE_CHANGE"
+  | "PERMISSION_CHANGE";
+
 export interface AdminUser {
   id: string;
   email?: string | null;
@@ -30,6 +60,8 @@ export interface Partner {
 
 export interface OfferBlock {
   id: string;
+  pageKey?: string | null;
+  categoryKey?: string | null;
   section: string;
   blockType: string;
   badge?: string | null;
@@ -46,6 +78,57 @@ export interface OfferBlock {
   order: number;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface BoardGame {
+  id: string;
+  title: string;
+  description: string;
+  playerBucket: string;
+  playTime?: string | null;
+  category?: string | null;
+  difficulty?: string | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type BoardGameSortMode = "AZ" | "ZA" | "PLAYERS" | "ORDER";
+
+export interface BoardGameCatalogPageData {
+  items: BoardGame[];
+  totalCount: number;
+  hasMore: boolean;
+  nextOffset?: number | null;
+  categories: string[];
+  difficulties: string[];
+  catalogTotalCount: number;
+  catalogWithImagesCount: number;
+}
+
+export type GalleryFolder =
+  | "all"
+  | "events"
+  | "partners"
+  | "offer"
+  | "board-games"
+  | "general";
+
+export interface GalleryAsset {
+  url: string;
+  pathname: string;
+  previewUrl: string;
+  contentType?: string | null;
+  uploadedAt: string;
+  size: number;
+}
+
+export interface GalleryListResponse {
+  items: GalleryAsset[];
+  hasMore: boolean;
+  nextCursor?: string;
 }
 
 export interface ContactSubmissionNote {
@@ -71,6 +154,42 @@ export interface ContactSubmission {
   notes?: ContactSubmissionNote[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface RolePermission {
+  role: Role;
+  resource: AdminResource;
+  canRead: boolean;
+  canWrite: boolean;
+  canDelete: boolean;
+  updatedAt: string;
+  updatedBy?: AdminUser | null;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  actor?: AdminUser | null;
+  actorRole?: Role | null;
+  resource: AdminResource;
+  action: AuditAction;
+  resourceId?: string | null;
+  summary: string;
+  details?: string | null;
+  createdAt: string;
+}
+
+export interface Statute {
+  id: string;
+  content: string;
+  updatedAt: string;
+}
+
+export interface StatuteVersion {
+  id: string;
+  content: string;
+  summary?: string | null;
+  authorId?: string | null;
+  createdAt: string;
 }
 
 export const ROLE_LABELS: Record<Role, string> = {

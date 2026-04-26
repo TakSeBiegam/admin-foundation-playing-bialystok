@@ -17,7 +17,9 @@ import ConfirmDialog from "@/app/components/ConfirmDialog";
 import ToastContainer, { type ToastData } from "@/app/components/Toast";
 import { Button } from "@/app/components/ui/button";
 import { gql } from "@/lib/graphql";
+import { resolveMediaUrl } from "@/lib/media";
 import type { Partner } from "@/lib/types";
+import Image from "next/image";
 
 const PARTNERS_QUERY = `query { partners { id name logoUrl websiteUrl description } }`;
 const CREATE_PARTNER = `mutation CreatePartner($input: CreatePartnerInput!) {
@@ -185,16 +187,21 @@ export default function PartnersPage() {
                 {partners.map((partner, index) => (
                   <tr
                     key={partner.id}
-                    className={`border-b border-white/5 transition-colors hover:bg-white/[0.02] ${index % 2 === 0 ? "" : "bg-white/[0.01]"}`}
+                    className={`border-b border-white/5 transition-colors hover:bg-white/2 ${index % 2 === 0 ? "" : "bg-white/1"}`}
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-[#1a1a1a]">
                           {partner.logoUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={partner.logoUrl}
+                            <Image
+                              src={
+                                resolveMediaUrl(partner.logoUrl) ||
+                                partner.logoUrl
+                              }
                               alt={partner.name}
+                              width={40}
+                              height={40}
+                              unoptimized
                               className="h-full w-full object-contain p-1"
                             />
                           ) : (
@@ -207,7 +214,7 @@ export default function PartnersPage() {
                       </div>
                     </td>
                     <td className="hidden px-4 py-3 text-white/50 md:table-cell">
-                      <p className="max-w-[220px] truncate">
+                      <p className="max-w-55 truncate">
                         {partner.description ?? "-"}
                       </p>
                     </td>
@@ -220,7 +227,7 @@ export default function PartnersPage() {
                           className="flex items-center gap-1.5 text-sm text-brand-yellow/70 transition-colors hover:text-brand-yellow"
                         >
                           <Globe className="h-3.5 w-3.5" />
-                          <span className="max-w-[180px] truncate">
+                          <span className="max-w-45 truncate">
                             {partner.websiteUrl.replace(/^https?:\/\//, "")}
                           </span>
                           <ExternalLink className="h-3 w-3 shrink-0" />

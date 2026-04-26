@@ -23,6 +23,12 @@ export async function POST(request: Request) {
     };
     if (session?.user?.id) headers["X-User-Id"] = session.user.id as string;
     if (session?.user?.role) headers["X-User-Role"] = session.user.role as string;
+    if (session?.user?.email) {
+      headers["X-User-Email"] = session.user.email as string;
+    }
+    if (session?.user?.name) {
+      headers["X-User-Name"] = session.user.name as string;
+    }
 
     const response = await fetch(BACKEND_URL, {
       method: "POST",

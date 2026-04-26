@@ -2,14 +2,14 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/app/components/ui/dialog";
-import { Button } from "@/app/components/ui/button";
+  AdminFormDialog,
+  FormActions,
+  FormField,
+  FormMediaField,
+  optionalUrlOrMediaPathPattern,
+  optionalUrlPattern,
+} from "@/app/components/forms/FormPrimitives";
 import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
 import { Textarea } from "@/app/components/ui/textarea";
 import type { Partner } from "@/lib/types";
 
@@ -37,6 +37,8 @@ export default function PartnerModal({
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PartnerFormValues>({
     defaultValues: { name: "", logoUrl: "", websiteUrl: "", description: "" },
@@ -55,87 +57,79 @@ export default function PartnerModal({
     }
   }, [partner, open, reset]);
 
+  const logoUrl = watch("logoUrl");
+
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-md bg-[#111111] border-white/10">
-        <DialogHeader>
-          <DialogTitle className="text-white">
-            {partner ? "Edytuj partnera" : "Nowy partner"}
-          </DialogTitle>
-        </DialogHeader>
+    <AdminFormDialog
+      open={open}
+      onClose={onClose}
+      title={partner ? "Edytuj partnera" : "Nowy partner"}
+      contentClassName="max-w-md"
+    >
+      <form onSubmit={handleSubmit(onSave)} className="space-y-4 pt-2">
+        <FormField
+          label="Nazwa *"
+          htmlFor="pt-name"
+          error={errors.name?.message}
+        >
+          <Input
+            id="pt-name"
+            placeholder="np. Kawiarnia META"
+            {...register("name", { required: "Nazwa jest wymagana" })}
+            aria-invalid={!!errors.name}
+          />
+        </FormField>
 
-        <form onSubmit={handleSubmit(onSave)} className="space-y-4 pt-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="pt-name">Nazwa *</Label>
-            <Input
-              id="pt-name"
-              placeholder="np. Kawiarnia META"
-              {...register("name", { required: "Nazwa jest wymagana" })}
-              aria-invalid={!!errors.name}
-            />
-            {errors.name && (
-              <p className="text-brand-red text-xs">{errors.name.message}</p>
-            )}
-          </div>
+        <FormField
+          label="Strona internetowa"
+          htmlFor="pt-website"
+          error={errors.websiteUrl?.message}
+        >
+          <Input
+            id="pt-website"
+            type="url"
+            placeholder="https://example.com"
+            {...register("websiteUrl", {
+              pattern: {
+                ...optionalUrlPattern,
+                message: "Podaj poprawny URL lub zostaw puste",
+              },
+            })}
+          />
+        </FormField>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="pt-website">Strona internetowa</Label>
-            <Input
-              id="pt-website"
-              type="url"
-              placeholder="https://example.com"
-              {...register("websiteUrl", {
-                pattern: {
-                  value: /^(https?:\/\/.+)?$/,
-                  message: "Podaj poprawny URL lub zostaw puste",
-                },
-              })}
-            />
-            {errors.websiteUrl && (
-              <p className="text-brand-red text-xs">
-                {errors.websiteUrl.message}
-              </p>
-            )}
-          </div>
+        <FormMediaField
+          registration={register("logoUrl", {
+            pattern: optionalUrlOrMediaPathPattern,
+          })}
+          label="Logo partnera"
+          inputId="pt-logo"
+          value={logoUrl}
+          placeholder="https://... albo wybór z galerii"
+          folder="partners"
+          error={errors.logoUrl?.message}
+          onChange={(value) =>
+            setValue("logoUrl", value, {
+              shouldDirty: true,
+              shouldValidate: true,
+            })
+          }
+        />
 
-          <div className="space-y-1.5">
-            <Label htmlFor="pt-logo">URL logo (opcjonalne)</Label>
-            <Input
-              id="pt-logo"
-              type="url"
-              placeholder="https://..."
-              {...register("logoUrl", {
-                pattern: {
-                  value: /^(https?:\/\/.+)?$/,
-                  message: "Podaj poprawny URL lub zostaw puste",
-                },
-              })}
-            />
-            {errors.logoUrl && (
-              <p className="text-brand-red text-xs">{errors.logoUrl.message}</p>
-            )}
-          </div>
+        <FormField label="Opis (opcjonalny)" htmlFor="pt-desc">
+          <Textarea
+            id="pt-desc"
+            rows={3}
+            placeholder="Krótki opis partnera..."
+            {...register("description")}
+          />
+        </FormField>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="pt-desc">Opis (opcjonalny)</Label>
-            <Textarea
-              id="pt-desc"
-              rows={3}
-              placeholder="Krótki opis partnera..."
-              {...register("description")}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="ghost" onClick={onClose}>
-              Anuluj
-            </Button>
-            <Button type="submit" variant="default">
-              {partner ? "Zapisz zmiany" : "Dodaj partnera"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <FormActions
+          onCancel={onClose}
+          submitLabel={partner ? "Zapisz zmiany" : "Dodaj partnera"}
+        />
+      </form>
+    </AdminFormDialog>
   );
 }

@@ -12,8 +12,8 @@ const BACKEND_URL = normalizeBackendUrl(
 );
 
 const SIGN_IN_MUTATION = `
-  mutation SignIn($email: String!, $password: String!) {
-    signIn(input: { email: $email, password: $password }) {
+  mutation SignIn($identifier: String!, $password: String!) {
+    signIn(input: { identifier: $identifier, password: $password }) {
       user {
         id
         email
@@ -24,19 +24,43 @@ const SIGN_IN_MUTATION = `
   }
 `;
 
-async function fetchLatestUserRole(userId: string) {
+type LatestUserIdentity = {
+  id: string;
+  role: string;
+};
+
+async function fetchLatestUserIdentity(params: {
+  userId?: string | null;
+  email?: string | null;
+  name?: string | null;
+}) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (params.userId) {
+    headers["X-User-Id"] = params.userId;
+  }
+  if (params.email) {
+    headers["X-User-Email"] = params.email;
+  }
+  if (params.name) {
+    headers["X-User-Name"] = params.name;
+  }
+
   const res = await fetch(BACKEND_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-User-Id": userId,
-    },
+    headers,
     body: JSON.stringify({ query: `query { me { id role } }` }),
     cache: "no-store",
   });
 
   const json = await res.json();
-  return json.errors || !json.data?.me?.role ? null : json.data.me.role;
+  if (json.errors || !json.data?.me?.id || !json.data?.me?.role) {
+    return null;
+  }
+
+  return json.data.me as LatestUserIdentity;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -46,11 +70,11 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email lub nazwa użytkownika", type: "text" },
+        identifier: { label: "Email lub nazwa użytkownika", type: "text" },
         password: { label: "Hasło", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials?.identifier || !credentials?.password) return null;
 
         try {
           const res = await fetch(BACKEND_URL, {
@@ -59,7 +83,7 @@ export const authOptions: NextAuthOptions = {
             body: JSON.stringify({
               query: SIGN_IN_MUTATION,
               variables: {
-                email: credentials.email,
+                identifier: credentials.identifier,
                 password: credentials.password,
               },
             }),
@@ -88,11 +112,16 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role ?? "EDITOR";
       }
 
-      if (token.id) {
+      if (token.id || token.email || token.name) {
         try {
-          const latestRole = await fetchLatestUserRole(String(token.id));
-          if (latestRole) {
-            token.role = latestRole;
+          const latestIdentity = await fetchLatestUserIdentity({
+            userId: token.id ? String(token.id) : null,
+            email: typeof token.email === "string" ? token.email : null,
+            name: typeof token.name === "string" ? token.name : null,
+          });
+          if (latestIdentity) {
+            token.id = latestIdentity.id;
+            token.role = latestIdentity.role;
           }
         } catch {
           // ignore - keep existing token role
