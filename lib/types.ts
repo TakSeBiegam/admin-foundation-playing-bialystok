@@ -3,8 +3,6 @@ export type Role = "ADMIN" | "MODERATOR" | "EDITOR" | "OWNER";
 export type AdminResource =
   | "AUTH"
   | "DASHBOARD"
-  | "OFFER_PAGE"
-  | "ABOUT_US_PAGE"
   | "EVENTS"
   | "PARTNERS"
   | "CATALOG"
@@ -56,28 +54,6 @@ export interface Partner {
   logoUrl?: string | null;
   websiteUrl?: string | null;
   description?: string | null;
-}
-
-export interface OfferBlock {
-  id: string;
-  pageKey?: string | null;
-  categoryKey?: string | null;
-  section: string;
-  blockType: string;
-  badge?: string | null;
-  title?: string | null;
-  subtitle?: string | null;
-  content?: string | null;
-  items: string[];
-  highlight?: string | null;
-  imageUrl?: string | null;
-  imageAlt?: string | null;
-  ctaLabel?: string | null;
-  ctaHref?: string | null;
-  isFeatured: boolean;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface BoardGame {

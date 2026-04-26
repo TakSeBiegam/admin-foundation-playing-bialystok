@@ -44,13 +44,13 @@ export function sanitizeStatuteHtml(value: string) {
 
         return {
           tagName: "a",
-          attribs: href
+          attribs: (href
             ? {
                 href,
                 rel: "noopener noreferrer nofollow",
                 target: "_blank",
               }
-            : {},
+            : { href: "" }) as Record<string, string>,
         };
       },
     },

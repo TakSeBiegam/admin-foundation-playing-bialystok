@@ -3,11 +3,9 @@ import {
   BarChart3,
   BookOpen,
   CalendarDays,
-  FileText,
   Handshake,
   History,
   ImageIcon,
-  Info,
   LayoutDashboard,
   Mail,
   ShieldCheck,
@@ -38,8 +36,6 @@ export interface AdminNavGroup {
 
 export const managedAdminResources: AdminResource[] = [
   "DASHBOARD",
-  "OFFER_PAGE",
-  "ABOUT_US_PAGE",
   "EVENTS",
   "PARTNERS",
   "CATALOG",
@@ -55,8 +51,6 @@ export const managedAdminResources: AdminResource[] = [
 export const adminResourceLabels: Record<AdminResource, string> = {
   AUTH: "Autoryzacja",
   DASHBOARD: "Dashboard",
-  OFFER_PAGE: "Oferta",
-  ABOUT_US_PAGE: "O nas",
   EVENTS: "Wydarzenia",
   PARTNERS: "Partnerzy",
   CATALOG: "Katalog",

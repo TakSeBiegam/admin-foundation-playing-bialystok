@@ -46,11 +46,13 @@ async function parseMarkdownFile(file: File) {
 }
 
 async function parsePdfFile(file: File) {
-  const { default: pdfParse } = await import("pdf-parse");
+  const { PDFParse } = await import("pdf-parse");
   const arrayBuffer = await file.arrayBuffer();
-  const parsedPdf = await pdfParse(Buffer.from(arrayBuffer));
+  const parsedPdf = new PDFParse(Buffer.from(arrayBuffer));
 
-  return convertImportedPlainTextToStatuteHtml(parsedPdf.text ?? "");
+  return convertImportedPlainTextToStatuteHtml(
+    (await parsedPdf.getText()).text,
+  );
 }
 
 async function buildImportResult(file: File, source: ImportSource) {
@@ -79,10 +81,7 @@ export async function POST(request: Request) {
     }
 
     if (file.size === 0) {
-      return NextResponse.json(
-        { error: "Plik jest pusty." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Plik jest pusty." }, { status: 400 });
     }
 
     if (file.size > MAX_IMPORT_SIZE_BYTES) {

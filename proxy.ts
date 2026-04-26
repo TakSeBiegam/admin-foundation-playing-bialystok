@@ -12,8 +12,6 @@ export const config = {
     "/partners/:path*",
     "/catalog/:path*",
     "/gallery/:path*",
-    "/offer/:path*",
-    "/about-us/:path*",
     "/messages/:path*",
     "/permissions/:path*",
     "/users/:path*",
